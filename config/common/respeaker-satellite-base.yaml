@@ -594,54 +594,6 @@ light:
               }
             }
       - addressable_lambda:
-          name: "Muted or Silent"
-          update_interval: 16ms
-          lambda: |-
-            static int8_t index = 0;
-            Color muted_color(255, 0, 0);
-            auto light_color = id(led_ring).current_values;
-            Color color(light_color.get_red() * 255, light_color.get_green() * 255,
-                  light_color.get_blue() * 255);
-            for (int i = 0; i < 12; i++) {
-              if ( light_color.get_state() ) {
-                it[i] = color;
-              } else {
-                it[i] = Color::BLACK;
-              }
-            }
-            if ( id(speaker_mute_switch).state ) {
-              it[2] = Color::BLACK;
-              it[3] = muted_color;
-              it[4] = Color::BLACK;
-              it[8] = Color::BLACK;
-              it[9] = muted_color;
-              it[10] = Color::BLACK;
-            }
-            if ( id(external_media_player).volume == 0.0f || id(external_media_player).is_muted() ) {
-              it[5] = Color::BLACK;
-              it[6] = muted_color;
-              it[7] = Color::BLACK;
-            }
-      - addressable_lambda:
-          name: "Volume Display"
-          update_interval: 50ms
-          lambda: |-
-            auto light_color = id(led_ring).current_values;
-            Color color(light_color.get_red() * 255, light_color.get_green() * 255,
-                  light_color.get_blue() * 255);
-            Color silenced_color(255, 0, 0);
-            auto volume_ratio = 12.0f * id(external_media_player).volume;
-            for (int i = 0; i < 12; i++) {
-              if (i <= volume_ratio) {
-                it[(6+i)%12] = color * min( 255.0f * (volume_ratio - i) , 255.0f ) ;
-              } else {
-                it[(6+i)%12] = Color::BLACK;
-              }
-            }
-            if (id(external_media_player).volume == 0.0f) {
-              it[6] = silenced_color;
-            }
-      - addressable_lambda:
           name: "Center Button Touched"
           update_interval: 16ms
           lambda: |-
@@ -1290,7 +1242,7 @@ speaker:
 media_player:
   - platform: speaker
     id: external_media_player
-    name: None
+    name: Media Player
     internal: False
     volume_increment: 0.05
     volume_min: 0.4
@@ -1360,7 +1312,7 @@ respeaker_lite:
     internal: false
     id: firmware_version
   firmware:
-    url: https://github.com/formatBCE/Respeaker-Lite-ESPHome-integration/raw/refs/heads/main/respeaker_lite_i2s_dfu_firmware_48k_v1.1.0.bin
+    url: https://github.com/idjmic/Respeaker-Lite-ESPHome-integration/raw/refs/heads/main/respeaker_lite_i2s_dfu_firmware_48k_v1.1.0.bin
     version: "1.1.0"
     md5: 9297155d1bf3eb21a9d4db52a89ea0c6
     on_begin:
@@ -1406,14 +1358,14 @@ external_components:
     refresh: 0s
   - source:
       type: git
-      url: https://github.com/formatBCE/home-assistant-voice-pe
+      url: https://github.com/idjmic/home-assistant-voice-pe
       ref: 48kHz_mic_support
     components:
       - nabu_microphone
     refresh: 0s
   - source:
       type: git
-      url: https://github.com/formatBCE/Respeaker-Lite-ESPHome-integration
+      url: https://github.com/idjmic/Respeaker-Lite-ESPHome-integration
       ref: main
     components: 
       - respeaker_lite
