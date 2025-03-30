@@ -21,7 +21,7 @@ I hope all the research and testing I've done here helps save you time and money
 
 ## YouTube Video showing FutureProofHomes RaspberryPi Setup Manually
 <a href="https://youtu.be/eTKgc0YDCwE?si=n6bkjROwIr6y7KvT" target="_blank">
-<img src="https://youtu.be/eTKgc0YDCwE?si=n6bkjROwIr6y7KvT" alt="RaspberryPi Wyoming Setup style="max-width: 100%; height: auto;"/>
+<img src="https://youtu.be/eTKgc0YDCwE?si=n6bkjROwIr6y7KvT" alt="RaspberryPi Wyoming Setup" style="max-width: 100%; height: auto;"/>
 </a>
 
 ## SeeedStudio ReSpeaker-Lite w/ESP32-S3 Soldered On board.
