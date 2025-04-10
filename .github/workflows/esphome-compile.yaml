@@ -26,17 +26,7 @@ jobs:
         run: esphome config config/respeaker-satellite-factory-dashboard.yaml
 
       - name: Compile firmware
-        run: esphome compile config/respeaker-satellite-factory-dashboard.yaml
-
-      - name: List build directory contents
-        run: ls -lh .esphome/build/
-
-      - name: Create ota directory
-        run: mkdir -p ota
-
-      - name: Move and rename firmware
-        run: |
-          cp $(find .esphome/build/ -type f -name firmware.bin | head -n 1) ota/idjmic-ota.bin
+        run: esphome compile config/respeaker-satellite-factory-dashboard.yaml --output ota/idjmic-ota.bin
 
       - name: Upload firmware artifact
         uses: actions/upload-artifact@v4
