@@ -12,7 +12,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/upload-artifact@v4
+        uses: actions/checkout@v3
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -31,9 +31,14 @@ jobs:
       - name: Create ota directory
         run: mkdir -p ota
 
-      - name: Move and rename firmware
+      - name: Find and copy firmware to ota folder
         run: |
-          cp .esphome/build/respeaker-satellite-factory-dashboard/.pioenvs/respeaker-satellite-factory-dashboard/firmware.bin ota/idjmic-ota.bin
+          FIRMWARE_PATH=$(find .esphome/build/ -type f -name firmware.bin | head -n 1)
+          echo "Found firmware at $FIRMWARE_PATH"
+          cp "$FIRMWARE_PATH" ota/idjmic-ota.bin
+
+      - name: Debug: List OTA contents
+        run: ls -lh ota
 
       - name: Upload firmware artifact
         uses: actions/upload-artifact@v4
