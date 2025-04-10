@@ -27,26 +27,24 @@ jobs:
 
       - name: Compile firmware
         run: |
-          echo "Current directory: $(pwd)"
           esphome compile config/respeaker-satellite-factory-dashboard.yaml || { echo "Compilation failed"; exit 1; }
-          echo "Listing .pioenvs directory:"
-          ls -la .pioenvs || echo ".pioenvs not found"
-          echo "Searching for firmware.bin:"
-          find . -name firmware.bin || echo "No firmware.bin found"
 
       - name: Create ota directory if not exists
         run: mkdir -p ota
 
       - name: Move and rename firmware
         run: |
-          FIRMWARE_PATH=$(find . -name firmware.bin)
+          FIRMWARE_PATH=$(find config/.esphome/build -name firmware.bin)
           if [ -z "$FIRMWARE_PATH" ]; then
             echo "Error: Firmware file not found"
-            find . -type d
+            find config/.esphome/build -type d
             exit 1
           fi
           echo "Found firmware at: $FIRMWARE_PATH"
           mv "$FIRMWARE_PATH" ota/idjmic-ota.bin
+
+      - name: Verify firmware file
+        run: ls -la ota/idjmic-ota.bin
 
       - name: Upload firmware artifact
         uses: actions/upload-artifact@v4
