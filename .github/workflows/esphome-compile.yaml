@@ -26,18 +26,17 @@ jobs:
         run: esphome config config/respeaker-satellite-factory-dashboard.yaml
 
       - name: Compile firmware
-        run: |
-          esphome compile config/respeaker-satellite-factory-dashboard.yaml || { echo "Compilation failed"; exit 1; }
-          ls -la .esphome/build/respeaker-satellite-factory-dashboard/.pio/build/respeaker-satellite-factory-dashboard/
+        run: esphome compile config/respeaker-satellite-factory-dashboard.yaml || { echo "Compilation failed"; exit 1; }
 
       - name: Create ota directory if not exists
         run: mkdir -p ota
 
       - name: Move and rename firmware
         run: |
-          FIRMWARE_PATH=$(find .esphome/build -name firmware.bin)
-          if [ -z "$FIRMWARE_PATH" ]; then
-            echo "Error: Firmware file not found"
+          FIRMWARE_PATH=".pioenvs/idjmic-satellite/firmware.bin"
+          if [ ! -f "$FIRMWARE_PATH" ]; then
+            echo "Error: Firmware file not found at $FIRMWARE_PATH"
+            ls -la .pioenvs/idjmic-satellite/
             exit 1
           fi
           mv "$FIRMWARE_PATH" ota/idjmic-ota.bin
