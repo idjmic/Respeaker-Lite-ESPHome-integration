@@ -12,7 +12,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -26,10 +26,16 @@ jobs:
         run: esphome config config/respeaker-satellite-factory-dashboard.yaml
 
       - name: Compile firmware
-        run: esphome compile config/respeaker-satellite-factory-dashboard.yaml --output ota/idjmic-ota.bin
+        run: esphome compile config/respeaker-satellite-factory-dashboard.yaml
+
+      - name: Create ota directory if not exists
+        run: mkdir -p ota
+
+      - name: Move and rename firmware
+        run: mv .esphome/build/respeaker-satellite-factory-dashboard/.pio/build/respeaker-satellite-factory-dashboard/firmware.bin ota/idjmic-ota.bin
 
       - name: Upload firmware artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
           name: idjmic-ota
           path: ota/idjmic-ota.bin
