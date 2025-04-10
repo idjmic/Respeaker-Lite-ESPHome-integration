@@ -1,0 +1,42 @@
+name: ESPHome Compile
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+
+      - name: Install ESPHome
+        run: pip install esphome
+
+      - name: Validate ESPHome config
+        run: esphome config respeaker-satellite-factory-dashboard.yaml
+
+      - name: Compile firmware
+        run: esphome compile respeaker-satellite-factory-dashboard.yaml
+
+      - name: Create ota directory
+        run: mkdir -p ota
+
+      - name: Move and rename firmware
+        run: |
+          cp .esphome/build/respeaker-satellite-factory-dashboard/.pioenvs/respeaker-satellite-factory-dashboard/firmware.bin ota/idjmic-ota.bin
+
+      - name: Upload firmware artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: idjmic-ota
+          path: ota/idjmic-ota.bin
