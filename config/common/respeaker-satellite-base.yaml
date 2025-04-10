@@ -20,7 +20,10 @@ substitutions:
 esphome:
   project: 
     name: idjmic.ReSpeaker Lite Satellite
-    version: 2025.4.0
+    version: 2025.4.1
+  name: idjmic-satellite
+  friendly_name: iDJMic Satellite
+  name_add_mac_suffix: true
   min_version: 2025.3.3
   on_boot:
     priority: 375
@@ -105,6 +108,7 @@ api:
 ota:
   - platform: esphome
     id: ota_esphome
+    password: !secret ota_password
 
 i2c:
   - id: internal_i2c
