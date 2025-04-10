@@ -7,7 +7,7 @@
     {
       "chipFamily": "ESP32-S3",
       "ota": {
-        "md5": "aa2ccc71befd51f05308c33455a5fd93",
+        "md5": "79cc090b3c6694c66884d8dd6af5ed9c",
         "path": "idjmic-satellite.factory.bin",
         "release_url": "https://github.com/idjmic/Respeaker-Lite-ESPHome-integration",
         "summary": "Amazing community update, Alarm functionality. Some improvements in media player stop handling. TTS URI replaced with event"
