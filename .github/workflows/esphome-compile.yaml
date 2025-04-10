@@ -36,7 +36,7 @@ jobs:
           cp .esphome/build/respeaker-satellite-factory-dashboard/.pioenvs/respeaker-satellite-factory-dashboard/firmware.bin ota/idjmic-ota.bin
 
       - name: Upload firmware artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: idjmic-ota
           path: ota/idjmic-ota.bin
