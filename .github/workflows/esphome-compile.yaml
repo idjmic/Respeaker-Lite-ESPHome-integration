@@ -38,7 +38,9 @@ jobs:
           cp "$FIRMWARE_PATH" ota/idjmic-ota.bin
 
       - name: Debug: List OTA contents
-        run: ls -lh ota
+        run: |
+          echo "Listing files in ota directory:"
+          ls -lh ota || echo "No files found"
 
       - name: Upload firmware artifact
         uses: actions/upload-artifact@v4
