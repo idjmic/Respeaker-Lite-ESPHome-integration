@@ -26,13 +26,21 @@ jobs:
         run: esphome config config/respeaker-satellite-factory-dashboard.yaml
 
       - name: Compile firmware
-        run: esphome compile config/respeaker-satellite-factory-dashboard.yaml
+        run: |
+          esphome compile config/respeaker-satellite-factory-dashboard.yaml || { echo "Compilation failed"; exit 1; }
+          ls -la .esphome/build/respeaker-satellite-factory-dashboard/.pio/build/respeaker-satellite-factory-dashboard/
 
       - name: Create ota directory if not exists
         run: mkdir -p ota
 
       - name: Move and rename firmware
-        run: mv .esphome/build/respeaker-satellite-factory-dashboard/.pio/build/respeaker-satellite-factory-dashboard/firmware.bin ota/idjmic-ota.bin
+        run: |
+          FIRMWARE_PATH=$(find .esphome/build -name firmware.bin)
+          if [ -z "$FIRMWARE_PATH" ]; then
+            echo "Error: Firmware file not found"
+            exit 1
+          fi
+          mv "$FIRMWARE_PATH" ota/idjmic-ota.bin
 
       - name: Upload firmware artifact
         uses: actions/upload-artifact@v4
