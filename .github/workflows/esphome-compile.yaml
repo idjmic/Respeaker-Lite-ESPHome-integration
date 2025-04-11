@@ -1,0 +1,118 @@
+name: ESPHome Compile
+
+on:
+  push:
+    branches: [main, "20*"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+
+      - name: Install ESPHome
+        run: pip install esphome
+
+      - name: Validate ESPHome config
+        run: esphome config config/respeaker-satellite-factory-dashboard.yaml
+
+      - name: Compile firmware
+        run: |
+          esphome compile config/respeaker-satellite-factory-dashboard.yaml || { echo "Compilation failed"; exit 1; }
+
+      - name: Move and rename firmware
+        run: |
+          FIRMWARE_PATH=$(find config/.esphome/build -name firmware.bin)
+          if [ -z "$FIRMWARE_PATH" ]; then
+            echo "Error: Firmware file not found"
+            find config/.esphome/build -type d
+            exit 1
+          fi
+          echo "Found firmware at: $FIRMWARE_PATH"
+          mkdir -p ota
+          mv "$FIRMWARE_PATH" ota/idjmic-ota.bin
+
+      - name: Verify firmware file
+        run: ls -la ota/idjmic-ota.bin
+
+      - name: Install yq
+        run: |
+          sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
+          sudo chmod +x /usr/local/bin/yq
+
+      - name: Calculate MD5 and update firmware.json
+        run: |
+          # Calculate MD5
+          MD5=$(md5sum ota/idjmic-ota.bin | cut -d' ' -f1)
+          echo "MD5 checksum: $MD5"
+          
+          # Read version and summary from ota/manifest.yaml
+          VERSION=$(yq eval '.version' ota/manifest.yaml)
+          SUMMARY=$(yq eval '.summary' ota/manifest.yaml)
+          if [ -z "$VERSION" ] || [ "$VERSION" = "null" ]; then
+            echo "Error: Could not read version from ota/manifest.yaml"
+            cat ota/manifest.yaml
+            exit 1
+          fi
+          if [ -z "$SUMMARY" ] || [ "$SUMMARY" = "null" ]; then
+            echo "Error: Could not read summary from ota/manifest.yaml"
+            cat ota/manifest.yaml
+            exit 1
+          fi
+          echo "Version: $VERSION"
+          echo "Summary: $SUMMARY"
+          
+          # Create or update firmware.json
+          cat > ota/firmware.json << EOF
+          {
+            "name": "iDJMic Satellite",
+            "version": "$VERSION",
+            "home_assistant_domain": "esphome",
+            "new_install_prompt_erase": false,
+            "builds": [
+              {
+                "chipFamily": "ESP32-S3",
+                "ota": {
+                  "md5": "$MD5",
+                  "path": "idjmic-ota.bin",
+                  "release_url": "https://github.com/idjmic/Respeaker-Lite-ESPHome-integration",
+                  "summary": "$SUMMARY"
+                }
+              }
+            ]
+          }
+          EOF
+          
+          # Pretty-print JSON for readability
+          python -m json.tool ota/firmware.json > ota/firmware.json.tmp && mv ota/firmware.json.tmp ota/firmware.json
+          
+          echo "Updated ota/firmware.json:"
+          cat ota/firmware.json
+
+      - name: Commit and push OTA files to repository
+        run: |
+          git config --global user.name "GitHub Action"
+          git config --global user.email "action@github.com"
+          git add ota/idjmic-ota.bin ota/firmware.json
+          
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Update idjmic-ota.bin and firmware.json for version $VERSION"
+            git push
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
