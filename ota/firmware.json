@@ -1,0 +1,17 @@
+{
+    "name": "iDJMic Satellite",
+    "version": "2025.4.1",
+    "home_assistant_domain": "esphome",
+    "new_install_prompt_erase": false,
+    "builds": [
+        {
+            "chipFamily": "ESP32-S3",
+            "ota": {
+                "md5": "e1e8b9e6d03cdb35ed9e918e27396fce",
+                "path": "idjmic-ota.bin",
+                "release_url": "https://github.com/idjmic/Respeaker-Lite-ESPHome-integration",
+                "summary": "Amazing community update, Alarm functionality. Some improvements in media player stop handling. TTS URI replaced with event"
+            }
+        }
+    ]
+}
