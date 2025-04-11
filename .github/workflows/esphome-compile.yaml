@@ -1,10 +1,8 @@
 name: ESPHome Compile
 
 on:
-  push:
-    branches: [main, "20*"]  # Match branches like 2025.4.1
   pull_request:
-  workflow_dispatch:
+    types: [closed]
 
 permissions:
   contents: write  # Allow writing to repository contents
@@ -12,6 +10,7 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true  # Only run on PR merges
 
     steps:
       - name: Checkout code
@@ -49,18 +48,22 @@ jobs:
       - name: Verify firmware file
         run: ls -la ota/idjmic-ota.bin
 
-      - name: Calculate MD5 and update firmware.json
+      - name: Calculate MD5 and update manifest.json
         run: |
           # Calculate MD5
           MD5=$(md5sum ota/idjmic-ota.bin | cut -d' ' -f1)
           echo "MD5 checksum: $MD5"
           
-          # Get version from branch name (e.g., refs/heads/2025.4.1 -> 2025.4.1)
-          VERSION=$(echo "${{ github.ref }}" | sed 's#refs/heads/##')
+          # Get version from PR source branch (e.g., 2025.4.1)
+          VERSION=${{ github.event.pull_request.head.ref }}
           echo "Version: $VERSION"
           
-          # Create or update firmware.json
-          cat > ota/firmware.json << EOF
+          # Get PR title for summary
+          SUMMARY=${{ github.event.pull_request.title }}
+          echo "Summary: $SUMMARY"
+          
+          # Create or update manifest.json
+          cat > ota/manifest.json << EOF
           {
             "name": "iDJMic Satellite",
             "version": "$VERSION",
@@ -73,30 +76,30 @@ jobs:
                   "md5": "$MD5",
                   "path": "idjmic-ota.bin",
                   "release_url": "https://github.com/idjmic/Respeaker-Lite-ESPHome-integration",
-                  "summary": "Amazing community update, Alarm functionality. Some improvements in media player stop handling. TTS URI replaced with event"
+                  "summary": "$SUMMARY"
                 }
               }
             ]
           }
           EOF
           
-          # Pretty-print JSON for readability
-          python -m json.tool ota/firmware.json > ota/firmware.json.tmp && mv ota/firmware.json.tmp ota/firmware.json
+          # Pretty-print JSON
+          python -m json.tool ota/manifest.json > ota/manifest.json.tmp && mv ota/manifest.json.tmp ota/manifest.json
           
-          echo "Updated ota/firmware.json:"
-          cat ota/firmware.json
+          echo "Updated ota/manifest.json:"
+          cat ota/manifest.json
 
       - name: Commit and push OTA files to repository
         run: |
           git config --global user.name "GitHub Action"
           git config --global user.email "action@github.com"
-          git add ota/idjmic-ota.bin ota/firmware.json
- 
+          git add ota/idjmic-ota.bin ota/manifest.json
+          
           # Check if there are changes to commit
           if git diff --staged --quiet; then
             echo "No changes to commit"
           else
-            git commit -m "Update idjmic-ota.bin and firmware.json for version ${{ github.ref_name }}"
+            git commit -m "Update idjmic-ota.bin and manifest.json for version ${{ github.event.pull_request.head.ref }}"
             git push
           fi
         env:
