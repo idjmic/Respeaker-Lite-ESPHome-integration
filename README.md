@@ -4,6 +4,8 @@ There are multiple options out there here is the break down I know of.
 I hope all the research and testing I've done here helps save you time and money in your decision! If you plan on buying parts please kindly use my affiliate links.
 <a href="https://www.amazon.ca/shop/idjmic/list/1O8CLD8X3UTK1?ref_=cm_sw_r_cp_ud_aipsflist_0R4S3R71DK1PWKB1JN01" target="_blank">Affiliate Amazon Shop for Home Assistant</a>
 
+<iframe width="560" height="315" src="https://www.youtube.com/embed/BvSzkr2tH_A?si=mibevWw74XSVQw8U" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
 ## Home Assistant Voice Preview Edition
 <a href="https://idjmic.com/images/satellite/HA-Voice-PE.jpg" target="_blank">
 <img src="https://idjmic.com/images/satellite/HA-Voice-PE.jpg" alt="HA Voice PE" style="max-width: 100%; height: auto;"/>
