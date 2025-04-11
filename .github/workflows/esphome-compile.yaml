@@ -2,12 +2,12 @@ name: ESPHome Compile
 
 on:
   push:
-    branches: [main]
+    branches: [main, "20*"]  # Match branches like 2025.4.1
   pull_request:
   workflow_dispatch:
 
 permissions:
-  contents: write  # Allow writing to repository contents (for git push)
+  contents: write  # Allow writing to repository contents
 
 jobs:
   build:
@@ -17,7 +17,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}  # Use GITHUB_TOKEN for authenticated checkout
+          token: ${{ secrets.GITHUB_TOKEN }}  # Authenticated checkout for push
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -49,12 +49,55 @@ jobs:
       - name: Verify firmware file
         run: ls -la ota/idjmic-ota.bin
 
-      - name: Commit and push OTA file to repository
+      - name: Calculate MD5 and update firmware.json
+        run: |
+          # Calculate MD5
+          MD5=$(md5sum ota/idjmic-ota.bin | cut -d' ' -f1)
+          echo "MD5 checksum: $MD5"
+          
+          # Get version from branch name (e.g., refs/heads/2025.4.1 -> 2025.4.1)
+          VERSION=$(echo "${{ github.ref }}" | sed 's#refs/heads/##')
+          echo "Version: $VERSION"
+          
+          # Create or update firmware.json
+          cat > ota/firmware.json << EOF
+          {
+            "name": "iDJMic Satellite",
+            "version": "$VERSION",
+            "home_assistant_domain": "esphome",
+            "new_install_prompt_erase": false,
+            "builds": [
+              {
+                "chipFamily": "ESP32-S3",
+                "ota": {
+                  "md5": "$MD5",
+                  "path": "idjmic-ota.bin",
+                  "release_url": "https://github.com/idjmic/Respeaker-Lite-ESPHome-integration",
+                  "summary": "Amazing community update, Alarm functionality. Some improvements in media player stop handling. TTS URI replaced with event"
+                }
+              }
+            ]
+          }
+          EOF
+          
+          # Pretty-print JSON for readability
+          python -m json.tool ota/firmware.json > ota/firmware.json.tmp && mv ota/firmware.json.tmp ota/firmware.json
+          
+          echo "Updated ota/firmware.json:"
+          cat ota/firmware.json
+
+      - name: Commit and push OTA files to repository
         run: |
           git config --global user.name "GitHub Action"
           git config --global user.email "action@github.com"
-          git add ota/idjmic-ota.bin
-          git commit -m "Update idjmic-ota.bin in ota/ folder" || echo "No changes to commit"
-          git push
+          git add ota/idjmic-ota.bin ota/firmware.json
+ 
+          # Check if there are changes to commit
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Update idjmic-ota.bin and firmware.json for version ${{ github.ref_name }}"
+            git push
+          fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
