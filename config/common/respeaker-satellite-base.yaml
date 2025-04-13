@@ -14,7 +14,7 @@ substitutions:
   voice_assist_not_ready_phase_id: '10'
   # The voice assistant encountered an error
   voice_assist_error_phase_id: '11'
-  # Change this to true in case you ahve a hidden SSID at home.
+  # Change this to true in case you have a hidden SSID at home.
   hidden_ssid: "false"
 
 esphome:
@@ -26,6 +26,9 @@ esphome:
   name_add_mac_suffix: true
   min_version: 2025.3.3
   on_boot:
+    - priority: 600
+      then:
+        - lambda: id(respeaker).unmute_speaker();
     - priority: 375
       then:
         - sensor.template.publish:
@@ -78,7 +81,7 @@ esp32:
 
 wifi:
   id: wifi_id
-  fast_connect: ${hidden_ssid}
+  fast_connect: false
   on_connect:
     - lambda: id(improv_ble_in_progress) = false;
     - script.execute: control_leds
@@ -1325,7 +1328,7 @@ script:
           event: esphome.tts_uri
           data:
             uri: !lambda return tts_uri;
-   - id: send_stt_text_event
+  - id: send_stt_text_event
     parameters:
       stt_text: string
     then:
