@@ -1,2 +1,2 @@
-version: 2025.4.2
-summary: Amazing community update, Alarm functionality. Some improvements in media player stop handling. TTS URI replaced with event.
+version: 2025.4.3
+summary: Fix for non-set alarm crash. Some PE improvements. STT event added.
