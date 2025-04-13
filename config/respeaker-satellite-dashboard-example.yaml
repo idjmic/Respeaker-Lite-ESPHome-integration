@@ -10,3 +10,8 @@ wifi:
     ssid: "iDJMic Satellite"
 #  ssid: !secret wifi_ssid
 #  password: !secret wifi_password
+
+ota:
+  - platform: esphome
+    id: ota_esphome
+    password: !secret ota_password
