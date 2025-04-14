@@ -7,7 +7,7 @@
         {
             "chipFamily": "ESP32-S3",
             "ota": {
-                "md5": "176389bd7fc9c244071de7164a5a884d",
+                "md5": "fc0d68f8469cc20ad08096bba907e5df",
                 "path": "idjmic-ota.bin",
                 "release_url": "https://github.com/idjmic/Respeaker-Lite-ESPHome-integration",
                 "summary": "Bug fixes"
