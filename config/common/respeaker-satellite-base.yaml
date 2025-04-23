@@ -20,7 +20,7 @@ substitutions:
 esphome:
   project: 
     name: idjmic.ReSpeaker Lite Satellite
-    version: 2025.4.4
+    version: 2025.4.5
   name: idjmic-satellite
   friendly_name: iDJMic Satellite
   name_add_mac_suffix: true
