@@ -1,16 +1,16 @@
 {
     "name": "iDJMic Satellite",
-    "version": "2025.4.4",
+    "version": "2025.4.5",
     "home_assistant_domain": "esphome",
     "new_install_prompt_erase": false,
     "builds": [
         {
             "chipFamily": "ESP32-S3",
             "ota": {
-                "md5": "eab9ba0290d4fb0dab090ac7f71958d5",
+                "md5": "9d76f3575fb3dc707a13903ca6aac24f",
                 "path": "idjmic-ota.bin",
                 "release_url": "https://github.com/idjmic/Respeaker-Lite-ESPHome-integration",
-                "summary": "Bug fixes"
+                "summary": "Push update"
             }
         }
     ]
